@@ -3,19 +3,24 @@ import { Cart } from "../pages/Cart/cart";
 import { ListProducts } from "../components/ListProducts/listProducts";
 
 export const Routes = () => {
-  const products = [
-    { id: 1, name: "Smart TV LED 50", price: 1999.0 },
-    { id: 2, name: "PlayStation 5", price: 12000.0 },
-    { id: 3, name: "Notebook Acer Nitro 5", price: 5109.72 },
-    { id: 4, name: "Headset s fio Logitech G935", price: 1359.0 },
-    { id: 5, name: "Tablet Samsung Galaxy Tab S7", price: 4844.05 },
-    { id: 6, name: "Cadeira Gamer Cruiser Preta FORTREK", price: 1215.16 },
-  ];
+  const [products, setProducts] = useState([
+    { id: 1, name: "Smart TV LED 50", price: 1999.0, vlrDesc: 0 },
+    { id: 2, name: "PlayStation 5", price: 12000.0, vlrDesc: 0 },
+    { id: 3, name: "Notebook Acer Nitro 5", price: 5109.72, vlrDesc: 0 },
+    { id: 4, name: "Headset s fio Logitech G935", price: 1359.0, vlrDesc: 0 },
+    { id: 5, name: "Tablet Samsung Galaxy Tab S7", price: 4844.05, vlrDesc: 0 },
+    {
+      id: 6,
+      name: "Cadeira Gamer Cruiser Preta FORTREK",
+      price: 1215.16,
+      vlrDesc: 0,
+    },
+  ]);
   const [cart, setCart] = useState([]);
   const [seeProducts, setSeeProducts] = useState(false);
   const [seeCart, setSeeCart] = useState(false);
   const [seeBFriday, setBFriday] = useState(true);
-  const [totCart, setTotCart] = useState();
+  const [totCart, setTotCart] = useState(0);
   const [desc, setDesc] = useState(0);
 
   const getRandomArbitrary = (min, max) => {
@@ -24,14 +29,16 @@ export const Routes = () => {
 
   const handleClick = () => {
     setBFriday(false);
-    let numberRandon = Number(getRandomArbitrary(0, cart.length - 1));
-    let percentual = Number(getRandomArbitrary(40, 90));
+    const numberRandon = Number(getRandomArbitrary(1, 6));
+    const percentual = Number(getRandomArbitrary(40, 90));
 
-    const search = cart[numberRandon];
-    let descTemp = (Number(search.price) * Number(percentual)) / 100;
-    setDesc(descTemp);
+    const search = products.find((item) => {
+      return item.id === numberRandon;
+    });
 
-    cart[numberRandon] = {
+    const descTemp = (Number(search.price) * Number(percentual)) / 100;
+
+    products[numberRandon] = {
       id: search.id,
       name: search.name,
       price: search.price,
@@ -39,17 +46,24 @@ export const Routes = () => {
       percentil: percentual,
       vlrPay: (Number(search.price) * (100 - Number(percentual))) / 100,
     };
-    setCart([...cart]);
+    setProducts([...products]);
   };
 
   useEffect(() => {
-    setTotCart(
-      cart.reduce((acc, item) => {
-        return acc + item.price;
-      }, 0)
-    );
+    if (cart[0] !== undefined) {
+      setTotCart(
+        cart.reduce((acc, item) => {
+          return acc + item.price;
+        }, 0)
+      );
+      setDesc(
+        cart.reduce((acc, item) => {
+          return acc + item.vlrDesc;
+        }, 0)
+      );
+    }
   }, [cart]);
-
+  console.log("desc: ", desc);
   return (
     <>
       {seeBFriday && (
