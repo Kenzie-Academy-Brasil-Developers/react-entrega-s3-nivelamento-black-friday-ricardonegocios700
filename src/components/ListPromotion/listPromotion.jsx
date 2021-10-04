@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { ShowItem } from "../ShowItem/showItem";
 
 export const ListPromotion = ({ cart, setCart, promotion }) => {

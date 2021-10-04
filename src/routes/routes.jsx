@@ -1,9 +1,6 @@
-import { useState } from "react";
-import { Route, Switch } from "react-router";
-import { GeneratePromotion } from "../pages/GeneratePromotion/generatePromotion";
-import { GenerateProtomotionCSS } from "../styles/style";
+import { useState, useEffect } from "react";
 import { Cart } from "../pages/Cart/cart";
-import { Link } from "react-router-dom";
+import { ListProducts } from "../components/ListProducts/listProducts";
 
 export const Routes = () => {
   const [products, setProducts] = useState([
@@ -15,29 +12,69 @@ export const Routes = () => {
     { id: 6, name: "Cadeira Gamer Cruiser Preta FORTREK", price: 1215.16 },
   ]);
   const [cart, setCart] = useState([]);
-  const [promotion, setPromotion] = useState("");
+  const [seeProducts, setSeeProducts] = useState(false);
+  const [seeCart, setSeeCart] = useState(false);
+  const [seeBFriday, setBFriday] = useState(true);
+  const [totCart, setTotCart] = useState();
+  const [desc, setDesc] = useState(0);
+  // const [pay, setPay] = useState();
+  // const [percentual, setPercentual] = useState();
+  let pay, percentual;
+
+  const getRandomArbitrary = (min, max) => {
+    return (Math.random() * (max - min) + min).toFixed(0);
+  };
+
+  const handleClick = () => {
+    setBFriday(false);
+    let numberRandon = Number(getRandomArbitrary(1, cart.length));
+    percentual = Number(getRandomArbitrary(40, 90));
+
+    const search = cart[numberRandon];
+    setDesc((Number(search.price) * Number(percentual)) / 100);
+    pay = (Number(search.price) * (100 - Number(percentual))) / 100;
+
+    cart[numberRandon] = {
+      id: search.id,
+      name: search.name,
+      price: search.price,
+      vlrDesc: desc,
+      percentil: percentual,
+      vlrPay: pay,
+    };
+    setCart([...cart]);
+  };
+
+  useEffect(() => {
+    setTotCart(
+      cart.reduce((acc, item) => {
+        return acc + item.price;
+      }, 0) - desc
+    );
+  }, [cart]);
 
   return (
     <>
-      <h4>
-        Cabeçalho com: Home e <Link to="/cart"> Carrinho</Link>
-      </h4>
-      <Switch>
-        <Route exact path="/">
-          <GenerateProtomotionCSS>
-            <GeneratePromotion
-              products={products}
-              cart={cart}
-              setCart={setCart}
-              setPromotion={setPromotion}
-              promotion={promotion}
-            />
-          </GenerateProtomotionCSS>
-        </Route>
-        <Route path="/cart">
-          <Cart cart={cart} />
-        </Route>
-      </Switch>
+      {seeBFriday && (
+        <button class="btn-see" onClick={handleClick}>
+          Black Friday
+        </button>
+      )}
+      <button class="btn-see" onClick={() => setSeeProducts(!seeProducts)}>
+        {seeProducts ? "Ocultar produtos" : "Exibir produtos"}
+      </button>
+      <button class="btn-see" onClick={() => setSeeCart(!seeCart)}>
+        {seeCart ? "Ocultar carrinho" : "Exibir carrinho"}
+      </button>
+      <p>
+        <div>Total do carrinho: {Number(totCart).toFixed(2)}</div>
+        <div>Total do desconto: {Number(desc).toFixed(2)}</div>
+        <div>Total a pagar: {(Number(totCart) - Number(desc)).toFixed(2)}</div>
+      </p>
+      {seeProducts && (
+        <ListProducts products={products} setCart={setCart} cart={cart} />
+      )}
+      {seeCart && <Cart cart={cart} />}
     </>
   );
 };

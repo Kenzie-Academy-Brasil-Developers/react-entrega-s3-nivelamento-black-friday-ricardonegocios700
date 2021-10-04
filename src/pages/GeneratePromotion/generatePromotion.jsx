@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ListPromotion } from "../../components/ListPromotion/listPromotion";
 
 export const GeneratePromotion = ({
@@ -37,7 +37,7 @@ export const GeneratePromotion = ({
 
   return (
     <>
-      <h2>Participe de nosso sorteio</h2>
+      <h2>Sorteie seu desconto</h2>
       <button onClick={handleButton}>Sorteio!</button>
       {promotion && (
         <ListPromotion cart={cart} setCart={setCart} promotion={promotion} />
